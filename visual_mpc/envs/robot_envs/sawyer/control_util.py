@@ -78,7 +78,7 @@ def state_to_pose(xyz, quat):
 def pose_to_ja(target_pose, start_joints, tolerate_ik_error=False, retry_on_fail = False, debug_z = None):
     try:
         return inverse_kinematics.get_joint_angles(target_pose, seed_cmd=start_joints,
-                                                        use_advanced_options=True)
+                                                        use_advanced_options=False)
     except ValueError:
         if retry_on_fail:
             logging.getLogger('robot_logger').error('retyring zangle was: {}'.format(debug_z))

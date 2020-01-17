@@ -30,7 +30,7 @@ def get_joint_angles(pose, seed_cmd = None, use_advanced_options = False):
     # Add desired pose for inverse kinematics
     ikreq.pose_stamp.append(pose)
     # Request inverse kinematics from base to "right_hand" link
-    ikreq.tip_names.append('right_hand')
+    ikreq.tip_names.append('right_gripper_tip')
 
     seed_joints = None
     if use_advanced_options:

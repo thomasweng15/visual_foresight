@@ -19,8 +19,8 @@ from .grippers.gripper import GripperInterface
 class RobotController(object):
     def __init__(self, robot_name='robot', print_debug=False, email_cred_file='', log_file='', control_rate=800, gripper_attached='none'):
         self._robot_name = robot_name
-        rospy.init_node("foresight_robot_controller")
-        rospy.on_shutdown(self.clean_shutdown)
+        # rospy.init_node("foresight_robot_controller")
+        # rospy.on_shutdown(self.clean_shutdown)
         self._control_rate = rospy.Rate(control_rate)
 
         logger = logging.getLogger('robot_logger')
