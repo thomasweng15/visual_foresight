@@ -15,13 +15,14 @@ import visual_mpc.envs.robot_envs as robot_envs
 
 
 class SawyerImpedanceController(RobotController):
-    def __init__(self, robot_name='sawyer', print_debug=False, email_cred_file='', log_file='', control_rate=800, gripper_attached='wsg-50'):
+    def __init__(self, robot_name='sawyer', print_debug=False, email_cred_file='', log_file='', control_rate=800, gripper_attached='wsg-50', eep_frame='right_hand'):
         super(SawyerImpedanceController, self).__init__(robot_name, print_debug, email_cred_file, log_file, control_rate, gripper_attached)
         self._rs = intera_interface.RobotEnable(intera_interface.CHECK_VERSION)
         self._limb = intera_interface.Limb("right")
         self.joint_names = self._limb.joint_names()
         self._ep_handler = LatestEEObs()
         self._cmd_publisher = rospy.Publisher('/robot/limb/right/joint_command', JointCommand, queue_size=100)
+        self._eep_frame = eep_frame
     
     def _init_gripper(self, gripper_attached):
         if gripper_attached == 'none':
@@ -33,6 +34,8 @@ class SawyerImpedanceController(RobotController):
         elif gripper_attached == 'sawyer_gripper':
             from visual_mpc.envs.robot_envs.grippers.sawyer.default_sawyer_gripper import SawyerDefaultGripper
             self._gripper = SawyerDefaultGripper()
+        elif gripper_attached == 'debug':
+            pass
         else:
             logging.getLogger('robot_logger').error("Gripper not supported!")
             raise NotImplementedError
@@ -76,7 +79,7 @@ class SawyerImpedanceController(RobotController):
         last_cmd = self._limb.joint_angles()
         joint_names = self._limb.joint_names()
 
-        interp_jas = precalculate_interpolation(p1, q1, p2, q2, duration, last_pos, last_cmd, joint_names)
+        interp_jas = precalculate_interpolation(p1, q1, p2, q2, duration, last_pos, last_cmd, joint_names, eep_frame=self._eep_frame)
 
         i = 0
         self._control_rate.sleep()

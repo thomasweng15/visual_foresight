@@ -21,7 +21,7 @@ from intera_core_msgs.srv import (
     SolvePositionIKRequest,
 )
 
-def get_joint_angles(pose, seed_cmd = None, use_advanced_options = False):
+def get_joint_angles(pose, seed_cmd = None, use_advanced_options = False, eep_frame='right_hand'):
     limb = "right"
     name_of_service = "ExternalTools/" + limb + "/PositionKinematicsNode/IKService"
     iksvc = rospy.ServiceProxy(name_of_service, SolvePositionIK)
@@ -30,7 +30,7 @@ def get_joint_angles(pose, seed_cmd = None, use_advanced_options = False):
     # Add desired pose for inverse kinematics
     ikreq.pose_stamp.append(pose)
     # Request inverse kinematics from base to "right_hand" link
-    ikreq.tip_names.append('right_gripper_tip')
+    ikreq.tip_names.append(eep_frame)
 
     seed_joints = None
     if use_advanced_options:

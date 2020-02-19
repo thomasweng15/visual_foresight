@@ -20,7 +20,7 @@ max_accel_mag = np.array([3.5, 2.5, 5, 5, 5, 5, 5])
 RESET_SKIP = 800
 
 
-def precalculate_interpolation(p1, q1, p2, q2, duration, last_pos, start_cmd, joint_names):
+def precalculate_interpolation(p1, q1, p2, q2, duration, last_pos, start_cmd, joint_names, eep_frame):
     q1, q2 = [Quaternion(x) for x in [q1, q2]]
     spline = QuinticSpline(p1, p2, duration)
     num_queries = int(CONTROL_RATE * duration / INTERP_SKIP) + 1
@@ -34,7 +34,7 @@ def precalculate_interpolation(p1, q1, p2, q2, duration, last_pos, start_cmd, jo
         try:
 
             interp_ja = pose_to_ja(interp_pose, last_cmd,
-                                   debug_z=z_angle * 180 / np.pi, retry_on_fail=True)
+                                   debug_z=z_angle * 180 / np.pi, retry_on_fail=True, eep_frame=eep_frame)
             last_cmd = interp_ja
             interp_ja = np.array([interp_ja[j] for j in joint_names])
             jas.append(interp_ja)
@@ -75,10 +75,10 @@ def state_to_pose(xyz, quat):
     return desired_pose
 
 
-def pose_to_ja(target_pose, start_joints, tolerate_ik_error=False, retry_on_fail = False, debug_z = None):
+def pose_to_ja(target_pose, start_joints, tolerate_ik_error=False, retry_on_fail = False, debug_z = None, eep_frame='right_hand'):
     try:
         return inverse_kinematics.get_joint_angles(target_pose, seed_cmd=start_joints,
-                                                        use_advanced_options=False)
+                                                        use_advanced_options=False, eep_frame=eep_frame)
     except ValueError:
         if retry_on_fail:
             logging.getLogger('robot_logger').error('retyring zangle was: {}'.format(debug_z))
